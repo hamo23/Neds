@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشاركة الموقع</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>تم جمع الموقع</h1>
+    <script>
+        window.onload = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendPosition, showError);
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع.");
+            }
+        };
+
+        function sendPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const link = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+            fetch('https://your-netlify-function-url/.netlify/functions/saveLocation', {  // ضع هنا رابط دالتك
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ location: link })
+            })
+            .then(response => response.json())
+            .then(data => console.log(data.message))
+            .catch(error => console.error('خطأ:', error));
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("لم يتم السماح بالوصول إلى الموقع.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("الموقع غير متاح.");
+                    break;
+                case error.TIMEOUT:
+                    alert("انتهت المهلة.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("حدث خطأ غير معروف.");
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
 
